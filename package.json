@@ -1,0 +1,33 @@
+{
+  "name": "cgeo-cpak",
+  "version": "0.1.0",
+  "description": "cpak export for cgeo types",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "tsc": "tsc",
+    "prepublish": "tsc -p src",
+    "test": "tsc -p test && node test/test.js"
+  },
+  "author": "Juha Järvi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/charto/cgeo-cpak.git"
+  },
+  "bugs": {
+    "url": "https://github.com/charto/cgeo-cpak/issues"
+  },
+  "homepage": "https://github.com/charto/cgeo-cpak#readme",
+  "keywords": [
+    "gis"
+  ],
+  "devDependencies": {
+    "@types/node": "^8.0.29",
+    "typescript": "^2.5.3"
+  },
+  "dependencies": {
+    "cgeo": "~0.1.0",
+    "cpak": "~0.0.1"
+  }
+}
