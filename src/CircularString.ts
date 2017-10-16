@@ -2,18 +2,17 @@
 // Released under the MIT license, see LICENSE.
 
 import * as cgeo from 'cgeo';
-import { Reader, Writer } from 'cpak';
 import { State } from './Geometry';
 
 @cgeo.mixin()
 export class CircularString extends cgeo.CircularString {
 
-	writeCpak(writer: Writer, state: State) {
-		return(cgeo.LineString.prototype.writeCpak.call(this, writer, state));
+	writeCpak(state: State) {
+		return(cgeo.LineString.prototype.writeCpak.call(this, state));
 	}
 
-	readCpak(reader: Reader, state: State) {
-		return(cgeo.LineString.prototype.readCpak.call(this, reader, state));
+	readCpak(state: State) {
+		return(cgeo.LineString.prototype.readCpak.call(this, state));
 	}
 
 }

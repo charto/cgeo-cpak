@@ -2,32 +2,31 @@
 // Released under the MIT license, see LICENSE.
 
 import * as cgeo from 'cgeo';
-import { Reader, Writer } from 'cpak';
 import { State } from './Geometry';
 
 @cgeo.mixin()
 export class Polygon extends cgeo.Polygon {
 
-	writeCpak(writer: Writer, state: State) {
+	writeCpak(state: State) {
 		let count = 0;
 
 		for(let child of this.childList) {
 			if(child) ++count;
 		}
 
-		writer.small(count);
+		state.writer.small(count);
 
 		for(let child of this.childList) {
-			if(child) child.writeCpak(writer, state);
+			if(child) child.writeCpak(state);
 		}
 	}
 
-	readCpak(reader: Reader, state: State) {
-		const count = reader.small();
+	readCpak(state: State) {
+		const count = state.reader.small();
 
 		for(let num = 0; num < count; ++num) {
 			const child = new cgeo.LineString();
-			child.readCpak(reader, state);
+			child.readCpak(state);
 			this.addChild(child);
 		}
 	}

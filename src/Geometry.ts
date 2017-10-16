@@ -10,22 +10,24 @@ export interface OptionsCpak {
 	inverse?: number;
 }
 
-export const cpakDefaults: OptionsCpak = {
-};
-
 export class State implements OptionsCpak {
 
-	constructor(options: OptionsCpak) {
+	constructor(options: OptionsCpak = {}, geom?: Geometry & cgeo.Geometry) {
 		this.precision = options.precision || 1;
 		this.inverse = options.inverse || 1 / this.precision;
-		this.pos = [ 0, 0 ];
 	}
 
 	precision: number;
 	/** Reciprocal of precision (1 / precision). */
 	inverse: number;
 
-	pos: number[];
+	x = 0;
+	y = 0;
+	z = 0;
+	m = 0;
+
+	reader: Reader;
+	writer: Writer;
 
 }
 
@@ -34,42 +36,44 @@ export type This = Geometry & cgeo.Geometry;
 @cgeo.mixin(cgeo.Geometry as any as { new(): cgeo.Geometry })
 export class Geometry {
 
-	readCpak(this: This, reader: Reader, state: State) {}
+	readCpak(this: This, state: State) {}
 
-	writeCpak(this: This, writer: Writer, state: State) {}
+	writeCpak(this: This, state: State) {}
 
-	writeFullCpak(this: This, writer: Writer, state: State) {
-		writer.small(this.kind);
+	writeFullCpak(this: This, state: State) {
+		state.writer.small(this.kind);
 
-		this.writeCpak(writer, state);
+		this.writeCpak(state);
 	}
 
-	toCpak(this: This, options = cpakDefaults) {
-		const state = new State(options);
-		const writer = new Writer();
+	toCpak(this: This, options?: OptionsCpak) {
+		const state = new State(options, this);
 
-		this.writeFullCpak(writer, state);
+		state.writer = new Writer();
+		this.writeFullCpak(state);
 
-		return(writer.data);
+		return(state.writer.data);
 	}
 
-	static readCpak(reader: Reader, state: State): cgeo.Geometry {
-		const tag = reader.small();
+	static readCpak(state: State): cgeo.Geometry {
+		const tag = state.reader.small();
 		const Type = cgeo.Geometry.typeList[tag];
 
 		if(!Type) throw(new Error('Unknown cpak geometry type ' + tag));
 
 		const geom = new Type();
 
-		geom.readCpak(reader, state);
+		geom.readCpak(state);
 
 		return(geom);
 	}
 
-	static fromCpak(data: string, options = cpakDefaults): cgeo.Geometry {
+	static fromCpak(data: string, options?: OptionsCpak): cgeo.Geometry {
 		const state = new State(options);
 
-		return(Geometry.readCpak(new Reader(data), state));
+		state.reader = new Reader(data);
+
+		return(Geometry.readCpak(state));
 	}
 
 }

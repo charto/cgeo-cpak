@@ -2,31 +2,31 @@
 // Released under the MIT license, see LICENSE.
 
 import * as cgeo from 'cgeo';
-import { Reader, Writer, decodeSign, encodeSign } from 'cpak';
+import { decodeSign, encodeSign } from 'cpak';
 import { State } from './Geometry';
 
 @cgeo.mixin()
 export class Point extends cgeo.Point {
 
-	writeCpak(writer: Writer, state: State) {
+	writeCpak(state: State) {
 		// Convert to integer first, to ensure delta is encoded reversibly.
-		const x = ~~(this.pos[0] * state.inverse);
-		const y = ~~(this.pos[1] * state.inverse);
+		const x = ~~(this.x * state.inverse);
+		const y = ~~(this.y * state.inverse);
 
-		writer.large(encodeSign(x - state.pos[0]));
-		writer.large(encodeSign(y - state.pos[1]));
+		state.writer.large(encodeSign(x - state.x));
+		state.writer.large(encodeSign(y - state.y));
 
-		state.pos[0] = x;
-		state.pos[1] = y;
+		state.x = x;
+		state.y = y;
 	}
 
-	readCpak(reader: Reader, state: State) {
+	readCpak(state: State) {
 		// Maintain unscaled integer coordinates in state to avoid rounding errors.
-		state.pos[0] += decodeSign(reader.large());
-		state.pos[1] += decodeSign(reader.large());
+		state.x += decodeSign(state.reader.large());
+		state.y += decodeSign(state.reader.large());
 
-		this.pos[0] = state.pos[0] * state.precision;
-		this.pos[1] = state.pos[1] * state.precision;
+		this.x = state.x * state.precision;
+		this.y = state.y * state.precision;
 	}
 
 }
